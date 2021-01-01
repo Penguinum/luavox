@@ -131,6 +131,37 @@ local function build_lua_function(c_function)
   return table.concat(lines, "\n")
 end
 
+local function build_functions_reg(functions)
+  local lines = {
+    "static const struct luaL_Reg luavox [] = {"
+  }
+
+  for i = 1, #functions do
+    local func = functions[i]
+    table.insert(
+      lines,
+      "  { \"" .. func.name .. "\", lua_" .. func.name .. "},"
+    )
+  end
+
+  table.insert(
+    lines,
+    "  { NULL, NULL }"
+  )
+  table.insert(lines, "};")
+  return table.concat(lines, "\n")
+end
+
+local LUAOPEN = [[
+
+
+int luaopen_luavox(lua_State *L) {
+  luaL_newlib(L, luavox);
+  sv_load_dll();
+  return 1;
+}
+]]
+
 local function build_binding(functions)
   local compiled_functions = {}
   for i = 1, #functions do
@@ -138,7 +169,8 @@ local function build_binding(functions)
     local compiled_function = build_lua_function(func)
     table.insert(compiled_functions, compiled_function)
   end
-  return LIB_TOP .. table.concat(compiled_functions, "\n\n") .. LIB_BOTTOM
+  return LIB_TOP .. table.concat(compiled_functions, "\n\n")
+    .. "\n\n" .. build_functions_reg(functions) .. LUAOPEN .. LIB_BOTTOM
 end
 
 return {
