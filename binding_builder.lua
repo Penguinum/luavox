@@ -1,6 +1,7 @@
 local overrides = require "overrides"
 
 local LIB_TOP = [[
+#include <dlfcn.h>
 #define SUNVOX_MAIN
 #include <sunvox.h>
 #ifdef __cplusplus
