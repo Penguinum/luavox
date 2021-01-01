@@ -1,4 +1,5 @@
 local overrides = require "overrides"
+local ignores = require "ignores"
 
 local LIB_TOP = [[
 #include <dlfcn.h>
@@ -89,6 +90,8 @@ end
 local function build_lua_function(c_function)
   if overrides[c_function.name] then
     return overrides[c_function.name]
+  elseif ignores[c_function.name] then
+    return nil
   end
   local function_name = "lua_" .. c_function.name
 
