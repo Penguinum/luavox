@@ -85,7 +85,10 @@ static int lua_sv_audio_callback2(lua_State* L) {
   // lua stack: {}, frames, latency, out_time, in_type, in_channels, in_buf
 
   for (int i = 0; i < lua_frames; i++) {
-    lua_in_buf[i] = (NUM)lua_rawgeti(L, -1, i + 1);
+    lua_pushnumber(L, i);
+    lua_gettable(L, -2);
+    lua_in_buf[i] = (NUM)luaL_checknumber(L, -1);
+    lua_pop(L, -1);
   }
 
   int lua_ret = sv_audio_callback2(
