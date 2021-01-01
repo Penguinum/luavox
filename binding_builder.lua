@@ -3,7 +3,6 @@ local overrides = require "overrides"
 local LIB_TOP = [[
 #define SUNVOX_MAIN
 #include <sunvox.h>
-
 #ifdef __cplusplus
 #include "lua.hpp"
 #else
@@ -131,17 +130,19 @@ local function build_lua_function(c_function)
   return table.concat(lines, "\n")
 end
 
-local function build_functions_reg(functions)
+local function build_functions_reg(functions, failures)
   local lines = {
     "static const struct luaL_Reg luavox [] = {"
   }
 
   for i = 1, #functions do
     local func = functions[i]
-    table.insert(
-      lines,
-      "  { \"" .. func.name .. "\", lua_" .. func.name .. "},"
-    )
+    if not failures[func.name] then
+      table.insert(
+        lines,
+        "  { \"" .. func.name .. "\", lua_" .. func.name .. "},"
+      )
+    end
   end
 
   table.insert(
@@ -164,13 +165,17 @@ int luaopen_luavox(lua_State *L) {
 
 local function build_binding(functions)
   local compiled_functions = {}
+  local failures = {}
   for i = 1, #functions do
     local func = functions[i]
     local compiled_function = build_lua_function(func)
     table.insert(compiled_functions, compiled_function)
+    if not compiled_function then
+      failures[func.name] = true
+    end
   end
   return LIB_TOP .. table.concat(compiled_functions, "\n\n")
-    .. "\n\n" .. build_functions_reg(functions) .. LUAOPEN .. LIB_BOTTOM
+    .. "\n\n" .. build_functions_reg(functions, failures) .. LUAOPEN .. LIB_BOTTOM
 end
 
 return {
