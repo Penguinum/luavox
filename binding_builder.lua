@@ -1,3 +1,5 @@
+local overrides = require "overrides"
+
 local LIB_TOP = [[
 #define SUNVOX_MAIN
 #include <sunvox.h>
@@ -83,6 +85,9 @@ local function make_function_call(fdef)
 end
 
 local function build_lua_function(c_function)
+  if overrides[c_function.name] then
+    return overrides[c_function.name]
+  end
   local function_name = "lua_" .. c_function.name
 
   local lines = {}
