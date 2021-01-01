@@ -17,6 +17,8 @@ local LIB_TOP = [[
 extern "C"{
 #endif
 
+#include <stdlib.h>
+
 ]]
 
 local LIB_BOTTOM = [[
