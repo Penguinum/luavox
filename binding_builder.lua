@@ -1,8 +1,10 @@
 local overrides = require "overrides"
+local structure_bindings = require "structure_bindings"
 local ignores = require "ignores"
 
 local LIB_TOP = [[
 #include <dlfcn.h>
+#include <string.h>
 #define SUNVOX_MAIN
 #include <sunvox.h>
 #ifdef __cplusplus
@@ -151,6 +153,10 @@ local function build_functions_reg(functions, failures)
 
   table.insert(
     lines,
+    "  { \"sunvox_note\", new_sunvox_note },"
+  )
+  table.insert(
+    lines,
     "  { NULL, NULL }"
   )
   table.insert(lines, "};")
@@ -161,6 +167,11 @@ local LUAOPEN = [[
 
 
 int luaopen_luavox(lua_State *L) {
+  luaL_newmetatable(L, "Sunvox.note");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_setfuncs(L, SunvoxNote, 0);
+
   luaL_newlib(L, luavox);
   sv_load_dll();
   return 1;
@@ -178,8 +189,14 @@ local function build_binding(functions)
       failures[func.name] = true
     end
   end
-  return LIB_TOP .. table.concat(compiled_functions, "\n\n")
-    .. "\n\n" .. build_functions_reg(functions, failures) .. LUAOPEN .. LIB_BOTTOM
+  local built_data_structures = structure_bindings.build()
+  return LIB_TOP
+    .. built_data_structures
+    .. table.concat(compiled_functions, "\n\n")
+    .. "\n\n"
+    .. build_functions_reg(functions, failures)
+    .. LUAOPEN
+    .. LIB_BOTTOM
 end
 
 return {
