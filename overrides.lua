@@ -13,5 +13,6 @@ overrides.sv_audio_callback2 = read_c_file("sv_audio_callback2")
 overrides.sv_get_module_inputs = read_c_file("sv_get_module_inputs")
 overrides.sv_get_module_outputs = read_c_file("sv_get_module_outputs")
 overrides.sv_get_module_scope2 = read_c_file("sv_get_module_scope2")
+overrides.sv_module_curve = read_c_file("sv_module_curve")
 
 return overrides
