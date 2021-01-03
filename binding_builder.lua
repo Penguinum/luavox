@@ -153,10 +153,6 @@ local function build_functions_reg(functions, failures)
 
   table.insert(
     lines,
-    "  { \"sunvox_note\", new_sunvox_note },"
-  )
-  table.insert(
-    lines,
     "  { NULL, NULL }"
   )
   table.insert(lines, "};")
