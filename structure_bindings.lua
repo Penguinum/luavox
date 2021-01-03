@@ -9,6 +9,7 @@ local function build()
   local code_parts = {}
 
   table.insert(code_parts, read_file("structure_bindings/sunvox_note.c"))
+  table.insert(code_parts, read_file("structure_bindings/buffer.c"))
 
   return table.concat(code_parts, "\n\n")
 end
