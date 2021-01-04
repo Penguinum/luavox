@@ -1,31 +1,27 @@
 static int lua_sv_audio_callback(lua_State* L) {
-    int lua_frames = (int)luaL_checknumber(L, 2);
-    int lua_latency = (int)luaL_checknumber(L, 3);
-    uint32_t lua_out_time = (uint32_t)luaL_checknumber(L, 4);
+  int lua_frames = (int)luaL_checknumber(L, 2);
+  int lua_latency = (int)luaL_checknumber(L, 3);
+  uint32_t lua_out_time = (uint32_t)luaL_checknumber(L, 4);
 
-    #ifdef SV_INIT_FLAG_AUDIO_FLOAT32
-      #define NUM float
-    #else
-      #define NUM int16_t
-    #endif
-    NUM* lua_buf = (NUM*)calloc(lua_frames, sizeof(NUM));
-    // lua stack: {}, frames, latency, out_time
+  void *cbuf;
 
-    int lua_ret = sv_audio_callback(
-      lua_buf,
-      lua_frames,
-      lua_latency,
-      lua_out_time
-    );
-
-    for (int i = 0; i < lua_frames; i++) {
-      lua_pushnumber(L, i + 1);
-      lua_pushnumber(L, lua_buf[i]);
-      lua_settable(L, 1);
-    }
-
-    lua_pushnumber(L, lua_ret);
-    free(lua_buf);
-
-    return 1;
+  if (use_int16_t) {
+    printf("using int16_t\n");
+    Buffer_int16_t *buf = luaL_checkudata(L, 1, "Sunvox.buffer_int16_t");
+    cbuf = &(buf->values);
+  } else {
+    printf("using float\n");
+    Buffer_float *buf = luaL_checkudata(L, 1, "Sunvox.buffer_float");
+    cbuf = &(buf->values);
   }
+
+  int lua_ret = sv_audio_callback(
+    cbuf,
+    lua_frames,
+    lua_latency,
+    lua_out_time
+  );
+
+  lua_pushnumber(L, lua_ret);
+  return 1;
+}

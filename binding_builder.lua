@@ -15,6 +15,7 @@ local LIB_TOP = [[
 #include <lauxlib.h>
 #endif
 
+static int use_int16_t = 1;
 
 #ifdef __cplusplus
 extern "C"{
@@ -90,10 +91,10 @@ local function make_function_call(fdef)
 end
 
 local function build_lua_function(c_function)
-  if overrides[c_function.name] then
-    return overrides[c_function.name]
-  elseif ignores[c_function.name] then
+  if ignores[c_function.name] then
     return nil
+  elseif overrides[c_function.name] then
+    return overrides[c_function.name]
   end
   local function_name = "lua_" .. c_function.name
 
@@ -153,7 +154,11 @@ local function build_functions_reg(functions, failures)
 
   table.insert(
     lines,
-    "  { NULL, NULL }"
+    [[
+  { "sunvox_buffer_float", new_buffer_float },
+  { "sunvox_buffer_int16_t", new_buffer_int16_t },
+  { NULL, NULL }
+    ]]
   )
   table.insert(lines, "};")
   return table.concat(lines, "\n")
@@ -167,6 +172,16 @@ int luaopen_luavox(lua_State *L) {
   lua_pushvalue(L, -1);
   lua_setfield(L, -2, "__index");
   luaL_setfuncs(L, SunvoxNote, 0);
+
+  luaL_newmetatable(L, "Sunvox.buffer_int16_t");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_setfuncs(L, SunvoxBuffer_int16_t, 0);
+
+  luaL_newmetatable(L, "Sunvox.buffer_float");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_setfuncs(L, SunvoxBuffer_float, 0);
 
   luaL_newlib(L, luavox);
   sv_load_dll();

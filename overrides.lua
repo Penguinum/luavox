@@ -7,6 +7,7 @@ local function register_override(func_name)
   overrides[func_name] = file_content
 end
 
+register_override("sv_init")
 register_override("sv_get_time_map")
 register_override("sv_audio_callback")
 register_override("sv_audio_callback2")
