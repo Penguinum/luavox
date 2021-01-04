@@ -155,8 +155,7 @@ local function build_functions_reg(functions, failures)
   table.insert(
     lines,
     [[
-  { "sunvox_buffer_float", new_buffer_float },
-  { "sunvox_buffer_int16_t", new_buffer_int16_t },
+  { "sunvox_buffer", new_buffer },
   { NULL, NULL }
     ]]
   )

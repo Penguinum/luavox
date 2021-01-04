@@ -15,6 +15,7 @@ local function build()
 
   table.insert(code_parts, buffer_float)
   table.insert(code_parts, buffer_int16_t)
+  table.insert(code_parts, read_file("structure_bindings/buffer_constructor.c"))
 
   return table.concat(code_parts, "\n\n")
 end
