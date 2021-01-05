@@ -1,6 +1,6 @@
 static int lua_sv_get_module_outputs(lua_State* L) {
-  int slot = (int)luaL_checknumber(L, 1);
-  int mod_num = (int)luaL_checknumber(L, 2);
+  int slot = luaL_checkinteger(L, 1);
+  int mod_num = luaL_checkinteger(L, 2);
 
   uint32_t module_flags = sv_get_module_flags(slot, mod_num);
 
@@ -10,8 +10,8 @@ static int lua_sv_get_module_outputs(lua_State* L) {
 
   lua_newtable(L);
   for (int i = 0; i < number_of_outputs; i++) {
-    lua_pushnumber(L, i + 1);
-    lua_pushnumber(L, ret[i]);
+    lua_pushinteger(L, i + 1);
+    lua_pushinteger(L, ret[i]);
     lua_settable(L, -3);
   }
 

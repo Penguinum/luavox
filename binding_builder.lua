@@ -23,6 +23,14 @@ extern "C"{
 
 #include <stdlib.h>
 
+static uint32_t check_unsigned_int(lua_State *L, int arg) {
+  int ret = luaL_checkinteger(L, arg);
+  if (ret < 0) {
+    return luaL_error(L, "bad argument #%d, expected unsigned integer", arg);
+  }
+  return (uint32_t)ret;
+}
+
 ]]
 
 local LIB_BOTTOM = [[
@@ -35,10 +43,10 @@ local LIB_BOTTOM = [[
 
 local readers = {
   ["int"] = function(n)
-    return ("(int)luaL_checknumber(L, %d)"):format(n)
+    return ("luaL_checkinteger(L, %d)"):format(n)
   end,
   ["uint32_t"] = function(n)
-    return ("(int)luaL_checknumber(L, %d)"):format(n)
+    return ("(uint32_t)check_unsigned_int(L, %d)"):format(n)
   end,
   ["double"] = function(n)
     return ("(double)luaL_checknumber(L, %d)"):format(n)
@@ -53,15 +61,15 @@ local readers = {
 
 local writers = {
   ["int"] = function(var)
-    return ("lua_pushnumber(L, %s)"):format(var)
+    return ("lua_pushinteger(L, %s)"):format(var)
+  end,
+  ["uint32_t"] = function(var)
+    return ("lua_pushinteger(L, %s)"):format(var)
   end,
   ["double"] = function(var)
     return ("lua_pushnumber(L, %s)"):format(var)
   end,
   ["float"] = function(var)
-    return ("lua_pushnumber(L, %s)"):format(var)
-  end,
-  ["uint32_t"] = function(var)
     return ("lua_pushnumber(L, %s)"):format(var)
   end,
   ["const char*"] = function(var)

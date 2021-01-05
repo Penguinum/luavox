@@ -1,7 +1,7 @@
 static int lua_sv_audio_callback(lua_State* L) {
-  int lua_frames = (int)luaL_checknumber(L, 2);
-  int lua_latency = (int)luaL_checknumber(L, 3);
-  uint32_t lua_out_time = (uint32_t)luaL_checknumber(L, 4);
+  int lua_frames = luaL_checkinteger(L, 2);
+  int lua_latency = luaL_checkinteger(L, 3);
+  uint32_t lua_out_time = check_unsigned_int(L, 4);
 
   void *cbuf;
 
@@ -22,6 +22,6 @@ static int lua_sv_audio_callback(lua_State* L) {
     lua_out_time
   );
 
-  lua_pushnumber(L, lua_ret);
+  lua_pushinteger(L, lua_ret);
   return 1;
 }
