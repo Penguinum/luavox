@@ -1,7 +1,7 @@
 local overrides = {}
 
 local function register_override(func_name)
-  local f = io.open("overrides/" .. func_name .. ".c", "r")
+  local f = io.open("includes/overrides/" .. func_name .. ".c", "r")
   local file_content = f:read("*all")
   f:close()
   overrides[func_name] = file_content
