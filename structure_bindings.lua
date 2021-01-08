@@ -8,14 +8,14 @@ end
 local function build()
   local code_parts = {}
 
-  table.insert(code_parts, read_file("structure_bindings/sunvox_note.c"))
-  local buffer_common = read_file("structure_bindings/buffer.c")
+  table.insert(code_parts, read_file("includes/sunvox_note.c"))
+  local buffer_common = read_file("includes/buffer.c")
   local buffer_float = buffer_common:gsub("SV_NUM", "float")
   local buffer_int16_t = buffer_common:gsub("SV_NUM", "int16_t")
 
   table.insert(code_parts, buffer_float)
   table.insert(code_parts, buffer_int16_t)
-  table.insert(code_parts, read_file("structure_bindings/buffer_constructor.c"))
+  table.insert(code_parts, read_file("includes/buffer_constructor.c"))
 
   return table.concat(code_parts, "\n\n")
 end
