@@ -155,7 +155,7 @@ local function build_functions_reg(functions, failures)
     if not failures[func.name] then
       table.insert(
         lines,
-        "  { \"" .. func.name .. "\", lua_" .. func.name .. "},"
+        "  { \"" .. func.name:gsub("^sv_", "") .. "\", lua_" .. func.name .. "},"
       )
     end
   end
