@@ -4,22 +4,29 @@
 Binding generator for [SunVox library](https://www.warmplace.ru/soft/sunvox/sunvox_lib.php) and the binding itself.
 
 ## Why?
-Wanna use SunVox library in Lua (probably in some love2d game). It's awesome, allows you doing dynamic/generative music and cool stuff like that.
+Wanna use SunVox library in Lua (probably in some love2d game). It's awesome, allows you doing dynamic/generative music and stuff.
 
 ## Okay, how do I use it?
-*first build*
+First, build it, okay?
+Then put both `luavox.so` and `sunvox.so` in lua libs path (most likely you'll want to put it in project root).
+Then:
 ```lua
-local luavox = require "luavox"
+local lv = require "luavox"
 
-sunvox.sv_open_slot(0)
-sunvox.sv_load(0, "Transient - Can It Be Beautiful.sunvox")
-sunvox.sv_volume(0, 256)
-sunvox.sv_play_from_beginning(0)
-os.execute("sleep 10") -- sleep 10 seconds
-sunvox.sv_stop(0)
-sunvox.sv_close_slot(0)
-sunvox.sv_deinit()
+if lv.init(0, 44100, 2, {}) >= 0 then
+    lv.open_slot(0)
+    lv.load(0, "Transient - Can It Be Beautiful.sunvox")
+    lv.volume(0, 256)
+    lv.play_from_beginning(0)
+    os.execute("sleep 10") -- sleep 10 seconds
+    lv.stop(0)
+    lv.close_slot(0)
+    lv.deinit()
+end
 ```
 
+## No Windows / Mac yet?
+Yep, can't guarantee it'll build on any of them but it should be simple to add support. The worst case is grabbing luavox.c and sunvox.h into Visual Studio project, configuring path to Lua source, maybe even changing a couple of lines in luavox.c. If I ever get a Windows machine again I'll add support for Windows.
+
 ## License?
-The SunVox library itself is proprietary, but it seems MIT will work for the binding. TODO yet though, still unsure.
+MIT license for evertything except contents of sunvox_lib. For MIT license see LICENSE.txt, for licenses of sunvox_lib folder content see sunvox_lib/docs.
