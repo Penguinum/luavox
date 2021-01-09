@@ -6,11 +6,9 @@ static int lua_sv_audio_callback(lua_State* L) {
   void *cbuf;
 
   if (use_int16_t) {
-    printf("using int16_t\n");
     Buffer_int16_t *buf = luaL_checkudata(L, 1, "Sunvox.buffer_int16_t");
     cbuf = &(buf->values);
   } else {
-    printf("using float\n");
     Buffer_float *buf = luaL_checkudata(L, 1, "Sunvox.buffer_float");
     cbuf = &(buf->values);
   }
