@@ -6,6 +6,10 @@ local LIB_TOP = [[
 #include <dlfcn.h>
 #endif
 
+#if defined(_WIN32) || defined(_WIN32_WCE) || defined(__WIN32__) || defined(_WIN64)
+#include <windows.h>
+#endif
+
 #include <string.h>
 #define SUNVOX_MAIN
 #include <sunvox.h>

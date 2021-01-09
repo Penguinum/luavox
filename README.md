@@ -26,7 +26,7 @@ end
 ```
 
 ## No Windows / Mac yet?
-Yep, can't guarantee it'll build on any of them but it should be simple to add support. The worst case is grabbing luavox.c and sunvox.h into Visual Studio project, configuring path to Lua source, maybe even changing a couple of lines in luavox.c. If I ever get a Windows machine again I'll add support for Windows.
+Yep, can't guarantee it'll build on any of them but it should be simple to add support. I managed to cross-compile Windows version with mingw, will add Windows support eventually.
 
 ## License?
 MIT license for evertything except contents of sunvox_lib. For MIT license see LICENSE.txt, for licenses of sunvox_lib folder content see sunvox_lib/docs.
