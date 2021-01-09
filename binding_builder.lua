@@ -2,7 +2,10 @@ local structure_bindings = require "structure_bindings"
 local function_bindings = require "function_bindings"
 
 local LIB_TOP = [[
+#ifdef __unix__
 #include <dlfcn.h>
+#endif
+
 #include <string.h>
 #define SUNVOX_MAIN
 #include <sunvox.h>
