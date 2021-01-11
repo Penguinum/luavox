@@ -6,6 +6,11 @@ describe("luavox library", function()
     assert.is.truthy(version > 0)
   end)
 
+  it("does init without flags", function()
+    local version = lv.init(0, 44100, 2)
+    assert.is.truthy(version > 0)
+  end)
+
   it("does load file", function()
     lv.open_slot(0)
     lv.load(0, "test.sunvox")

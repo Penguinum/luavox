@@ -9,6 +9,12 @@ SV_INIT_FLAG_AUDIO_FLOAT32 - desired sample type of the output sound stream : fl
 SV_INIT_FLAG_ONE_THREAD - audio callback and song modification are in single thread; use it with SV_INIT_FLAG_USER_AUDIO_CALLBACK only.
 */
 static int get_init_flags(lua_State *L, int nparam) {
+  int param_table_argument_type = lua_type(L, nparam);
+  if (param_table_argument_type == LUA_TNIL || param_table_argument_type == LUA_TNONE) {
+    return 0;
+  } else if (param_table_argument_type != LUA_TTABLE) {
+    luaL_checktype(L, nparam, LUA_TTABLE);
+  }
   int flags = 0;
   if (is_flag_set_true(L, nparam, "no_debug_output")) {
     flags |= SV_INIT_FLAG_NO_DEBUG_OUTPUT;
@@ -38,8 +44,6 @@ static int lua_sv_init(lua_State *L) {
   const char* config = luaL_checkstring(L, 1);
   int freq = luaL_checkinteger(L, 2);
   int channels = luaL_checkinteger(L, 3);
-  // Let's suppose we have params table instead of flags
-  luaL_checktype(L, 4, LUA_TTABLE);
 
   uint32_t flags = get_init_flags(L, 4);
 
