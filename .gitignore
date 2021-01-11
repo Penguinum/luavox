@@ -1,2 +1,4 @@
 sunvox.h
 .vscode
+spec/*.so
+spec/*.sunvox
