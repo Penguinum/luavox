@@ -10,5 +10,6 @@ shared_lib:
 
 test: build
 	cp -n sunvox_lib/headers/sunvox.h spec/
+	cp -n sunvox_lib/resources/test.sunvox spec/
 	cp build/luavox.so spec/
 	busted -C spec/ .
