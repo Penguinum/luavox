@@ -6,12 +6,15 @@ SV_TIME_MAP_FRAMECNT: dest[X] = frame counter at the beginning of line X.
 */
 static int get_time_map_flags(lua_State *L, int nparam) {
   int flags = 0;
+  luaL_checktype(L, nparam, LUA_TTABLE);
 
   const char* dest = get_string_param(L, nparam, "dest");
   if (strcmp(dest, "speed") == 0) {
     flags |= SV_TIME_MAP_SPEED;
   } else if (strcmp(dest, "framecnt") == 0) {
     flags |= SV_TIME_MAP_FRAMECNT;
+  } else {
+    luaL_error(L, "Bad parameter value \"%s\" for parameter \"dest\"", dest);
   }
   return flags;
 }
