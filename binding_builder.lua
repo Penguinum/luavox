@@ -64,6 +64,20 @@ static int get_int_param(lua_State *L, int nparam, const char *key) {
   }
 }
 
+static const char* get_string_param(lua_State *L, int nparam, const char *key) {
+  lua_pushstring(L, key);
+  lua_gettable(L, nparam);
+  int ltype = lua_type(L, -1);
+  if (ltype == LUA_TNIL) {
+    return "";
+  } else if (ltype == LUA_TSTRING) {
+    return luaL_checkstring(L, -1);
+  } else {
+    luaL_error(L, "Bad parameter type for '%s': expected string, got %s\n", key, lua_typename(L, ltype));
+    return ""; // won't get there tbh
+  }
+}
+
 ]]
 
 local LIB_BOTTOM = [[
