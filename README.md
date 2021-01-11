@@ -25,8 +25,27 @@ if lv.init(0, 44100, 2, {}) >= 0 then
 end
 ```
 
-## No Windows / Mac yet?
-Yep, can't guarantee it'll build on any of them but it should be simple to add support. I managed to cross-compile Windows version with mingw, will add Windows support eventually.
+## Building
+```sh
+$ sh build_source.sh
+$ mkdir build
+$ cd build
+$ cmake .. -G"Unix Makefiles" # or whatever lower level build system you want to use
+$ make
+```
+In case you're cross-compiling, or CMake can't find Lua,
+or you want different version of Lua from what CMake finds for you,
+you'll have to provide it some variables.
+Example for cross-compiling from Linux to Windows:
+```sh
+$ cmake .. -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../Win64CrossCompileToolchain\
+     -DLUA_LIBRARIES=/path/to/compiled/lua/src \
+     -DLUA_INCLUDE_DIR=/path/to/compiled/lua/src \
+     -DLUA_LIB=lua # may be something like -DLUA_LIB=luajit-5.1.dll in case of LuaJIT
+```
+Little bit messy, but it works.
+Don't know if it'll work for Mac, most likely will build with no pain.
 
 ## License?
-MIT license for evertything except contents of sunvox_lib. For MIT license see LICENSE.txt, for licenses of sunvox_lib folder content see sunvox_lib/docs.
+MIT license for evertything except contents of sunvox_lib.
+For MIT license see LICENSE.txt, for licenses of sunvox_lib folder content see sunvox_lib/docs.
