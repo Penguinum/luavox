@@ -16,5 +16,6 @@ register_override("sv_get_module_outputs")
 register_override("sv_get_module_scope2")
 register_override("sv_module_curve")
 register_override("sv_get_pattern_data")
+register_override("sv_get_module_flags")
 
 return overrides
