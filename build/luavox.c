@@ -60,6 +60,20 @@ static int get_int_param(lua_State *L, int nparam, const char *key) {
   }
 }
 
+static const char* get_string_param(lua_State *L, int nparam, const char *key) {
+  lua_pushstring(L, key);
+  lua_gettable(L, nparam);
+  int ltype = lua_type(L, -1);
+  if (ltype == LUA_TNIL) {
+    return "";
+  } else if (ltype == LUA_TSTRING) {
+    return luaL_checkstring(L, -1);
+  } else {
+    luaL_error(L, "Bad parameter type for '%s': expected string, got %s\n", key, lua_typename(L, ltype));
+    return ""; // won't get there tbh
+  }
+}
+
 typedef struct Note {
   sunvox_note *note;
 } Note;
@@ -347,7 +361,13 @@ SV_INIT_FLAG_AUDIO_INT16 - desired sample type of the output sound stream : int1
 SV_INIT_FLAG_AUDIO_FLOAT32 - desired sample type of the output sound stream : float; the actual sample type may be different, if SV_INIT_FLAG_USER_AUDIO_CALLBACK is not set;
 SV_INIT_FLAG_ONE_THREAD - audio callback and song modification are in single thread; use it with SV_INIT_FLAG_USER_AUDIO_CALLBACK only.
 */
-static int get_flags(lua_State *L, int nparam) {
+static int get_init_flags(lua_State *L, int nparam) {
+  int param_table_argument_type = lua_type(L, nparam);
+  if (param_table_argument_type == LUA_TNIL || param_table_argument_type == LUA_TNONE) {
+    return 0;
+  } else if (param_table_argument_type != LUA_TTABLE) {
+    luaL_checktype(L, nparam, LUA_TTABLE);
+  }
   int flags = 0;
   if (is_flag_set_true(L, nparam, "no_debug_output")) {
     flags |= SV_INIT_FLAG_NO_DEBUG_OUTPUT;
@@ -377,10 +397,8 @@ static int lua_sv_init(lua_State *L) {
   const char* config = luaL_checkstring(L, 1);
   int freq = luaL_checkinteger(L, 2);
   int channels = luaL_checkinteger(L, 3);
-  // Let's suppose we have params table instead of flags
-  luaL_checktype(L, 4, LUA_TTABLE);
 
-  uint32_t flags = get_flags(L, 4);
+  uint32_t flags = get_init_flags(L, 4);
 
   // use_int16_t is defined on top of compiled file
   // see luavox.c when it's built
@@ -549,6 +567,27 @@ static int lua_sv_get_song_length_lines(lua_State *L) {
   lua_pushinteger(L, ret);
   return 1;
 }
+/*
+From SunVox docs:
+
+SV_TIME_MAP_SPEED: dest[X] = BPM | ( TPL << 16 ) (speed at the beginning of line X);
+SV_TIME_MAP_FRAMECNT: dest[X] = frame counter at the beginning of line X.
+*/
+static int get_time_map_flags(lua_State *L, int nparam) {
+  int flags = 0;
+  luaL_checktype(L, nparam, LUA_TTABLE);
+
+  const char* dest = get_string_param(L, nparam, "dest");
+  if (strcmp(dest, "speed") == 0) {
+    flags |= SV_TIME_MAP_SPEED;
+  } else if (strcmp(dest, "framecnt") == 0) {
+    flags |= SV_TIME_MAP_FRAMECNT;
+  } else {
+    luaL_error(L, "Bad parameter value \"%s\" for parameter \"dest\"", dest);
+  }
+  return flags;
+}
+
 static int lua_sv_get_time_map(lua_State* L) {
     int lua_slot = luaL_checkinteger(L, 1);
     int lua_start_line = luaL_checkinteger(L, 2);
@@ -556,7 +595,7 @@ static int lua_sv_get_time_map(lua_State* L) {
 
     uint32_t* lua_dest = (uint32_t*)calloc(lua_len, sizeof(uint32_t));
 
-    int lua_flags = luaL_checkinteger(L, 5);
+    int lua_flags = get_time_map_flags(L, 4);
 
     int lua_ret = sv_get_time_map(
       lua_slot,
@@ -565,17 +604,18 @@ static int lua_sv_get_time_map(lua_State* L) {
       lua_dest,
       lua_flags
     );
-    // lua stack: slot, line, len, {}, flags
+    lua_pushinteger(L, lua_ret);
+    // lua stack: slot, line, len, flags, lua_ret
+    lua_newtable(L); // time map
     for (int i = 0; i < lua_len; i++) {
       lua_pushinteger(L, i + 1);
       lua_pushinteger(L, lua_dest[i]);
-      // lua stack: slot, line, len, {}, flags, i, value
-      lua_settable(L, -4);
+      // lua stack: slot, line, len, flags, lua_ret, time_map, i, value
+      lua_settable(L, -3);
     }
-    lua_pushinteger(L, lua_ret);
     free(lua_dest);
-
-    return 1;
+    // lua stack: slot, line, len, flags, lua_ret, time_map
+    return 2;
   }
 
 static int lua_sv_new_module(lua_State *L) {
@@ -644,13 +684,63 @@ static int lua_sv_find_module(lua_State *L) {
   lua_pushinteger(L, ret);
   return 1;
 }
+/*
+From SunVox docs, module flags are:
+
+SV_MODULE_FLAG_EXISTS;
+SV_MODULE_FLAG_EFFECT;
+SV_MODULE_FLAG_MUTE;
+SV_MODULE_FLAG_SOLO;
+SV_MODULE_FLAG_BYPASS;
+SV_MODULE_INPUTS_OFF;
+SV_MODULE_INPUTS_MASK;
+SV_MODULE_OUTPUTS_OFF;
+SV_MODULE_OUTPUTS_MASK;
+*/
+
+static int flags[] = {
+  SV_MODULE_FLAG_EXISTS,
+  SV_MODULE_FLAG_EFFECT,
+  SV_MODULE_FLAG_MUTE,
+  SV_MODULE_FLAG_SOLO,
+  SV_MODULE_FLAG_BYPASS,
+  SV_MODULE_INPUTS_OFF,
+  SV_MODULE_INPUTS_MASK,
+  SV_MODULE_OUTPUTS_OFF,
+  SV_MODULE_OUTPUTS_MASK,
+};
+
+static char* flags_str[] = {
+  "flag_exists",
+  "flag_effect",
+  "flag_mute",
+  "flag_solo",
+  "flag_bypass",
+  "inputs_off",
+  "inputs_mask",
+  "outputs_off",
+  "outputs_mask",
+};
+
+static int flags_count = 9;
+
 static int lua_sv_get_module_flags(lua_State *L) {
-  int lua_slot = luaL_checkinteger(L, 1);
-  int lua_mod_num = luaL_checkinteger(L, 2);
-  uint32_t ret = sv_get_module_flags(lua_slot, lua_mod_num);
-  lua_pushinteger(L, ret);
+  int lua_slot = (int)luaL_checknumber(L, 1);
+  int lua_mod_num = (int)luaL_checknumber(L, 2);
+  uint32_t module_flags = sv_get_module_flags(lua_slot, lua_mod_num);
+  lua_newtable(L); // table with values mapped to flags
+
+  for (int i = 0; i < flags_count; i++) {
+    if (module_flags & flags[i]) {
+      lua_pushstring(L, flags_str[i]);
+      lua_pushboolean(L, 1);
+      lua_settable(L, -3);
+    }
+  }
+
   return 1;
 }
+
 static int lua_sv_get_module_inputs(lua_State* L) {
     int slot = luaL_checkinteger(L, 1);
     int mod_num = luaL_checkinteger(L, 2);
