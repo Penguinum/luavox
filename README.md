@@ -7,9 +7,7 @@ Binding generator for [SunVox library](https://www.warmplace.ru/soft/sunvox/sunv
 Wanna use SunVox library in Lua (probably in some love2d game). It's awesome, allows you doing dynamic/generative music and stuff.
 
 ## Okay, how do I use it?
-First, build it, okay?
-Then put both `luavox.so` and `sunvox.so` in lua libs path (most likely you'll want to put it in project root).
-Then:
+Simple example:
 ```lua
 local lv = require "luavox"
 
@@ -24,6 +22,8 @@ if lv.init(0, 44100, 2, {}) >= 0 then
     lv.deinit()
 end
 ```
+It's mostly the same as in original lib with removing prefix "sv_" from functions, really.
+For more details proceed to API_reference.md
 
 ## Building
 ```sh
@@ -49,3 +49,6 @@ Don't know if it'll work for Mac, most likely will build with no pain.
 ## License?
 MIT license for evertything except contents of sunvox_lib.
 For MIT license see LICENSE.txt, for licenses of sunvox_lib folder content see sunvox_lib/docs.
+
+## Warning
+This is kind of an alpha stage so beware of falling ~~breaks~~ bricks
