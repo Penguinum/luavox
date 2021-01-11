@@ -8,7 +8,7 @@ SV_INIT_FLAG_AUDIO_INT16 - desired sample type of the output sound stream : int1
 SV_INIT_FLAG_AUDIO_FLOAT32 - desired sample type of the output sound stream : float; the actual sample type may be different, if SV_INIT_FLAG_USER_AUDIO_CALLBACK is not set;
 SV_INIT_FLAG_ONE_THREAD - audio callback and song modification are in single thread; use it with SV_INIT_FLAG_USER_AUDIO_CALLBACK only.
 */
-static int get_flags(lua_State *L, int nparam) {
+static int get_init_flags(lua_State *L, int nparam) {
   int flags = 0;
   if (is_flag_set_true(L, nparam, "no_debug_output")) {
     flags |= SV_INIT_FLAG_NO_DEBUG_OUTPUT;
@@ -41,7 +41,7 @@ static int lua_sv_init(lua_State *L) {
   // Let's suppose we have params table instead of flags
   luaL_checktype(L, 4, LUA_TTABLE);
 
-  uint32_t flags = get_flags(L, 4);
+  uint32_t flags = get_init_flags(L, 4);
 
   // use_int16_t is defined on top of compiled file
   // see luavox.c when it's built
