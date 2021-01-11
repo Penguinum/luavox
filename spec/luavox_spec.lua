@@ -1,14 +1,16 @@
 local lv = require "luavox"
 
 describe("luavox library", function()
-  it("does init", function()
-    local version = lv.init(0, 44100, 2, { offline = true })
-    assert.is.truthy(version > 0)
-  end)
+  describe("sv_init", function()
+    it("does work with flags", function()
+      local version = lv.init(0, 44100, 2, { offline = true })
+      assert.is.truthy(version > 0)
+    end)
 
-  it("does init without flags", function()
-    local version = lv.init(0, 44100, 2)
-    assert.is.truthy(version > 0)
+    it("does work without flags", function()
+      local version = lv.init(0, 44100, 2)
+      assert.is.truthy(version > 0)
+    end)
   end)
 
   it("does load file", function()
