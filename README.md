@@ -27,7 +27,7 @@ For more details proceed to API_reference.md
 
 ## Building
 ```sh
-$ sh build_source.sh
+$ sh build_source.sh # pass lua5.1 as argument if you want to build for Lua 5.1
 $ mkdir build
 $ cd build
 $ cmake .. -G"Unix Makefiles" # or whatever lower level build system you want to use

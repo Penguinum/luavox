@@ -16,6 +16,7 @@ end
 local function main()
   local header_path = arg[1]
   local out_file = arg[2]
+  local lua_ver = arg[3]
 
   if not header_path then
     exit_with_message("Please provide valid path to sunvox header")
@@ -33,7 +34,7 @@ local function main()
   fd:close()
 
   local functions = header_parser.parse(header)
-  local code = binding_builder.build_binding(functions)
+  local code = binding_builder.build_binding(functions, lua_ver)
 
   fd, err = io.open(out_file, "w")
   if not fd then

@@ -89,7 +89,32 @@ local LIB_BOTTOM = [[
 ]]
 
 
-local LUAOPEN = [[
+local LUAOPEN51 = [[
+
+
+int luaopen_luavox(lua_State *L) {
+  luaL_newmetatable(L, "Sunvox.note");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_register(L, 0, SunvoxNote);
+
+  luaL_newmetatable(L, "Sunvox.buffer_int16_t");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_register(L, 0, SunvoxBuffer_int16_t);
+
+  luaL_newmetatable(L, "Sunvox.buffer_float");
+  lua_pushvalue(L, -1);
+  lua_setfield(L, -2, "__index");
+  luaL_register(L, 0, SunvoxBuffer_float);
+
+  luaL_register(L, "luavox", luavox);
+  sv_load_dll();
+  return 1;
+}
+]]
+
+local LUAOPEN52 = [[
 
 
 int luaopen_luavox(lua_State *L) {
@@ -114,13 +139,17 @@ int luaopen_luavox(lua_State *L) {
 }
 ]]
 
-local function build_binding(functions)
+local function build_binding(functions, lua_ver)
   local built_data_structures = structure_bindings.build()
   local built_functions = function_bindings.build(functions)
+  local luaopen = LUAOPEN52
+  if lua_ver == "lua5.1" then
+    luaopen = LUAOPEN51
+  end
   return LIB_TOP
     .. built_data_structures
     .. built_functions
-    .. LUAOPEN
+    .. luaopen
     .. LIB_BOTTOM
 end
 
