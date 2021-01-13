@@ -30,7 +30,7 @@ extern "C"{
 #include <stdlib.h>
 
 static uint32_t check_unsigned_int(lua_State *L, int arg) {
-  int ret = luaL_checkinteger(L, arg);
+  lua_Integer ret = luaL_checkinteger(L, arg);
   if (ret < 0) {
     return luaL_error(L, "bad argument #%d, expected unsigned integer", arg);
   }
